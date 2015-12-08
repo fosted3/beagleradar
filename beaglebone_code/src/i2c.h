@@ -2,7 +2,10 @@
  * i2c.h v3
  * func prototypes for I2C functions
  ************************************/
- 
+#ifndef I2C_H_
+#define I2C_H_
+
+#define I2CBUS 1
 // bus=1 for interface I2C2 on BBB
 // returns handle to be used in remainder functions
 // addr is a 7-bit value (so, for example the BMP085 datasheet specifies
@@ -12,8 +15,8 @@ int i2c_open(unsigned char bus, unsigned char addr);
 // These functions return -1 on error, otherwise return the number of bytes read/written.
 // To perform a 'repeated start' use the i2c_write_read function which can write some
 // data and then immediately read data without a stop bit in between.
-int i2c_write(int handle, unsigned char* buf, unsigned int length);
-int i2c_read(int handle, unsigned char* buf, unsigned int length);
+int i2c_write(int handle, unsigned char* buf, int length);
+int i2c_read(int handle, unsigned char* buf, int length);
 int i2c_write_read(int handle,
                    unsigned char addr_w, unsigned char *buf_w, unsigned int len_w,
                    unsigned char addr_r, unsigned char *buf_r, unsigned int len_r);
@@ -30,3 +33,4 @@ int i2c_close(int handle);
 // The maximum delay is 999msec
 int delay_ms(unsigned int msec);
 
+#endif

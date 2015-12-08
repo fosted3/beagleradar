@@ -10,7 +10,9 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <time.h>
-#include "i2cfunc.h"
+#include <string.h>
+#include <unistd.h>
+#include "i2c.h"
 
 
 int i2c_open(unsigned char bus, unsigned char addr)
@@ -31,7 +33,7 @@ int i2c_open(unsigned char bus, unsigned char addr)
   return(file);
 }
 
-int i2c_write(int handle, unsigned char* buf, unsigned int length)
+int i2c_write(int handle, unsigned char* buf, int length)
 {
   if (write(handle, buf, length) != length)
   {
@@ -51,7 +53,7 @@ int i2c_write_byte(int handle, unsigned char val)
   return(1);
 }
 
-int i2c_read(int handle, unsigned char* buf, unsigned int length)
+int i2c_read(int handle, unsigned char* buf, int length)
 {
   if (read(handle, buf, length) != length)
   {

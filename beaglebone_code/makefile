@@ -20,8 +20,8 @@ release: BUILD_DIR=build/release
 release: setup
 release: $(EXECUTABLE)
 
-$(EXECUTABLE): $(BUILD_DIR)/beaglelogic.o $(BUILD_DIR)/main.o
-	$(CC) $(BUILD_DIR)/beaglelogic.o $(BUILD_DIR)/main.o -o $(BIN_DIR)/$(EXECUTABLE) $(LDFLAGS)
+$(EXECUTABLE): $(BUILD_DIR)/beaglelogic.o $(BUILD_DIR)/main.o $(BUILD_DIR)/i2c.o
+	$(CC) $(BUILD_DIR)/beaglelogic.o $(BUILD_DIR)/main.o $(BUILD_DIR)/i2c.o -o $(BIN_DIR)/$(EXECUTABLE) $(LDFLAGS)
 
 $(BUILD_DIR)/beaglelogic.o: src/beaglelogic.c
 	$(CC) $(CFLAGS) src/beaglelogic.c -o $(BUILD_DIR)/beaglelogic.o
@@ -29,6 +29,9 @@ $(BUILD_DIR)/beaglelogic.o: src/beaglelogic.c
 $(BUILD_DIR)/main.o: src/main.c
 	$(CC) $(CFLAGS) src/main.c -o $(BUILD_DIR)/main.o
 	
+$(BUILD_DIR)/i2c.o: src/i2c.c
+	$(CC) $(CFLAGS) src/i2c.c -o $(BUILD_DIR)/i2c.o
+
 setup:
 	mkdir -p $(DIRS)
 	

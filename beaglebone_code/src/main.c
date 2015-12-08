@@ -17,7 +17,9 @@ typedef enum
 	ERR_SUCCESS = 0,
 	ERR_OPEN_FAIL,
 	ERR_ALLOC_FAIL,
-	ERR_BUFF_FAIL
+	ERR_BUFF_FAIL,
+	ERR_I2C_FAIL,
+	ERR_INIT_FAIL
 } result_t;
 
 typedef struct
@@ -31,13 +33,26 @@ typedef struct
 typedef struct
 {
 	int beaglelogic_fd;
+	int i2c_fd;
 	uint8_t *beaglelogic_mem;
 	sample_t *buffer;
 	uint32_t to_read;
+	uint16_t dac;
+	unsigned char dac_buf[2];
 } state_t;
 
-
-
+result_t update_dac(state_t *state)
+{
+	state -> i2c_fd = i2c_open(I2CBUS, 0x60);
+	state -> dac_buf[0] = ((state -> dac) >> 8) & 0x0F;
+	state -> dac_buf[1] = (state -> dac) & 0xFF;
+	if (i2c_write(state -> i2c_fd, state -> dac_buf, 2) != 2)
+	{
+		return ERR_I2C_FAIL;
+	}
+	i2c_close(state -> i2c_fd);
+	return ERR_SUCCESS;
+}
 
 result_t init(state_t *state)
 {
@@ -63,6 +78,11 @@ result_t init(state_t *state)
 	beaglelogic_set_samplerate(state -> beaglelogic_fd, 100 * 1000 * 1000); //set to 100MSPS
 	beaglelogic_set_sampleunit(state -> beaglelogic_fd, BL_SAMPLEUNIT_16_BITS); //set to 16b sample size
 	beaglelogic_set_triggerflags(state -> beaglelogic_fd, BL_TRIGGERFLAGS_ONESHOT); //one capture
+	state -> dac = 2048;
+	if (update_dac(state))
+	{
+		return ERR_I2C_FAIL;
+	}
 	return ERR_SUCCESS;
 }
 
@@ -70,20 +90,20 @@ result_t capture(state_t *state)
 {
 	int32_t size;
 	uint32_t offset = 0;
-	uint32_t samples = (state -> to_read) / 2; //2B per sample
-	uint32_t i;
+	//uint32_t samples = (state -> to_read) / 2; //2B per sample
+	//uint32_t i;
 	beaglelogic_start(state -> beaglelogic_fd); //start capture
 	memset(state -> buffer, 0xFF, state -> to_read);
 	do
 	{
 		size = read(state -> beaglelogic_fd, (state -> buffer) + (offset / 2), 4 * 1024 * 1024); //read in 4 MiB chunks
 		if (size > 0) { offset += size; } //actually got data
-		printf("offset is %u\n\r", offset);
+		//printf("offset is %u\n\r", offset);
 	} while (offset < state -> to_read);
-	for (i = 0; i < samples; i++)
+	/*for (i = 0; i < samples; i++)
 	{
 		printf("sample %u is %x %x %x %04x\n\r", i, ((state -> buffer)[i]).reserved, ((state -> buffer)[i]).clock, ((state -> buffer)[i]).overflow, ((state -> buffer)[i]).sample);
-	}
+	}*/
 	return ERR_SUCCESS;
 }
 
@@ -92,7 +112,8 @@ int main(void)
 	state_t state;
 	if (!init(&state))
 	{
-		capture(&state);
+		return ERR_INIT_FAIL;
 	}
-	return 0;
+	capture(&state);
+	return ERR_SUCCESS;
 }
