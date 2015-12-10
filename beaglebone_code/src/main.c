@@ -107,13 +107,21 @@ result_t capture(state_t *state)
 	return ERR_SUCCESS;
 }
 
+void cleanup(state_t *state)
+{
+	beaglelogic_munmap(state -> beaglelogic_fd, state -> beaglelogic_mem);
+	beaglelogic_close(state -> beaglelogic_fd);
+	free(state -> buffer);
+}
+
 int main(void)
 {
 	state_t state;
-	if (!init(&state))
+	if (init(&state))
 	{
 		return ERR_INIT_FAIL;
 	}
 	capture(&state);
+	cleanup(&state);
 	return ERR_SUCCESS;
 }
