@@ -26,6 +26,7 @@ uint32_t compute_fft(std::vector<float> *data, std::vector<float> *result)
 	{
 		actual_size = next_pow_2(actual_size);
 		data -> reserve(actual_size);
+		result -> clear();
 		result -> reserve(actual_size);
 		while (data -> size() < actual_size)
 		{
@@ -40,7 +41,7 @@ uint32_t compute_fft(std::vector<float> *data, std::vector<float> *result)
 	}
 	for (i = 0; i < actual_size; i++)
 	{
-		result -> at(i) = temp[i];
+		result -> push_back(temp[i]);
 	}
 	delete temp;
 	return 0;
