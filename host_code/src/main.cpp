@@ -7,18 +7,18 @@
 
 int main(void)
 {
-	std::vector<float> input;
-	std::vector<float> output;
-	input.reserve(8000);
-	for (unsigned int i = 0; i < 8000; i++)
+	std::vector<std::vector<float> > inputs(1000, std::vector<float>(8000));
+	std::vector<std::vector<float> > outputs(1000, std::vector<float>(8000));
+	init_image();
+	for (unsigned int i = 0; i < 1000; i++)
 	{
-		input.push_back(cos(i * 3.1415 / 500.0));
+		for (unsigned int j = 0; j < 8000; j++)
+		{
+			inputs[i][j] = cos(j * 3.1415 * i / 1000.0);
+		}
+		compute_fft(&(inputs[i]), &(outputs[i]));
 	}
-	unsigned int result = compute_fft(&input, &output);
-	for (unsigned int i = 0; i < output.size(); i++)
-	{
-		std::cout << output.at(i) << ", ";
-	}
-	std::cout << std::endl;
+	generate_image(&outputs, "out.png");
+	deinit_image();
 	return 0;
 }
