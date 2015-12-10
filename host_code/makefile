@@ -39,7 +39,7 @@ $(BUILD_DIR)/cuda_helper.o: src/cuda_helper.cpp
 	$(CC) $(CFLAGS) src/cuda_helper.cpp -o $(BUILD_DIR)/cuda_helper.o
 
 $(BUILD_DIR)/network.o: src/network.cpp
-	$(CC) $(CLFAGS) src/network.cpp -o $(BUILD_DIR)/network.o
+	$(CC) $(CFLAGS) src/network.cpp -o $(BUILD_DIR)/network.o
 
 $(BUILD_DIR)/fft.o: src/fft.cu
 	$(NVCC) $(CUDA_CFLAGS) src/fft.cu -o $(BUILD_DIR)/fft.o $(CUDA_INCLUDES)
