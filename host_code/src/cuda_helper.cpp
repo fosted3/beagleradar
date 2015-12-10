@@ -37,7 +37,7 @@ uint32_t compute_fft(std::vector<float> *data, std::vector<float> *result)
 	if (c2c_fft(data -> data(), temp, actual_size))
 	{
 		delete temp;
-		return -1;
+		return 1;
 	}
 	for (i = 0; i < actual_size; i++)
 	{
