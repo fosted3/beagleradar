@@ -30,3 +30,9 @@
 
 # Debug files
 *.dSYM/
+
+*/bin/*
+*/build/*
+*.csv
+*.png
+*.mkv
