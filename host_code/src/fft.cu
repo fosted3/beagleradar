@@ -57,5 +57,6 @@ uint32_t c2c_fft(const float *input, float *output, uint32_t size)
 	handle_error(cudaFreeHost(host_output));
 	handle_error(cudaFree(device_input));
 	handle_error(cudaFree(device_output));
+	handle_fft(cufftDestroy(plan));
 	return 0;
 }
