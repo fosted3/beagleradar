@@ -10,6 +10,7 @@
 #include "libbeaglelogic.h"
 #include <assert.h>
 #include "i2c.h"
+#include "network.h"
 
 
 typedef enum
@@ -19,7 +20,8 @@ typedef enum
 	ERR_ALLOC_FAIL,
 	ERR_BUFF_FAIL,
 	ERR_I2C_FAIL,
-	ERR_INIT_FAIL
+	ERR_INIT_FAIL,
+	ERR_NETWORK_FAIL
 } result_t;
 
 typedef struct
@@ -109,11 +111,17 @@ result_t capture(state_t *state)
 
 int main(void)
 {
-	state_t state;
-	if (!init(&state))
+	state_t main_state;
+	network_state_t network_state;
+	if (!init(&main_state))
 	{
 		return ERR_INIT_FAIL;
 	}
-	capture(&state);
+	if (!network_init(&network_state))
+	{
+		return ERR_NETWORK_FAIL;
+	}
+	
+	capture(&main_state);
 	return ERR_SUCCESS;
 }
