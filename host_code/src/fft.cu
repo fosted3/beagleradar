@@ -60,3 +60,36 @@ uint32_t compute_single_fft_abs(const float *input, float *output, uint32_t size
 	handle_fft(cufftDestroy(plan));
 	return 0;
 }
+
+uint32_t compute_multi_fft_abs(const float *input, float *output, uint32_t size, uint32_t offset, uint32_t stride)
+{
+	cufftHandle plan;
+	float2 *host_input = NULL;
+	float2 *host_output = NULL;
+	float2 *device_input = NULL;
+	float2 *device_output = NULL;
+	uint32_t i;
+	handle_error(cudaMallocHost(&host_input, sizeof(float2) * size));
+	handle_error(cudaMallocHost(&host_output, sizeof(float2) * size));
+	for (i = 0; i < size; i++)
+	{
+		host_input[i].x = input[i];
+		host_input[i].y = 0;
+	}
+	handle_error(cudaMalloc(&device_input, sizeof(float2) * size));
+	handle_error(cudaMalloc(&device_output, sizeof(float2) * size));
+	handle_error(cudaMemcpy(device_input, host_input, sizeof(float2) * size, cudaMemcpyHostToDevice);
+	handle_fft(cudaPlanMany(&plan, 1, NULL, &size, 
+	return 0;
+}
+
+uint32_t compute_single_fft_complex(const float *input, float *output, uin32_t size)
+{
+	return 0;
+}
+
+uint32_t compute_multi_fft_complex(const float *input, float *output, uint32_t size)
+{
+	return 0;
+}
+
