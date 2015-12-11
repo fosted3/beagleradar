@@ -5,6 +5,7 @@
 #include <cuda_runtime.h>
 #include <cufft.h>
 #include <stdint.h>
+#include <assert.h>
 //#include <helper_functions.h>
 //#include <helper_cuda.h>
 
@@ -61,7 +62,42 @@ uint32_t compute_single_fft_abs(const float *input, float *output, uint32_t size
 	return 0;
 }
 
-uint32_t compute_multi_fft_abs(const float *input, float *output, uint32_t size, uint32_t offset, uint32_t stride)
+uint32_t compute_multi_fft_abs(const float *input, float *output, uint32_t size, uint32_t stride)
+{
+	cufftHandle plan;
+	float2 *host_input = NULL;
+	float2 *host_output = NULL;
+	float2 *device_input = NULL;
+	float2 *device_output = NULL;
+	uint32_t i;
+	int dim[1] = {stride};
+	assert(size % stride == 0);
+	handle_error(cudaMallocHost(&host_input, sizeof(float2) * size));
+	handle_error(cudaMallocHost(&host_output, sizeof(float2) * size));
+	for (i = 0; i < size; i++)
+	{
+		host_input[i].x = input[i];
+		host_input[i].y = 0;
+	}
+	handle_error(cudaMalloc(&device_input, sizeof(float2) * size));
+	handle_error(cudaMalloc(&device_output, sizeof(float2) * size));
+	handle_error(cudaMemcpy(device_input, host_input, sizeof(float2) * size, cudaMemcpyHostToDevice));
+	handle_fft(cufftPlanMany(&plan, 1, dim, NULL, 1, stride, NULL, 1, stride, CUFFT_C2C, size / stride));
+	handle_fft(cufftExecC2C(plan, (cufftComplex *) device_input, (cufftComplex *) device_output, CUFFT_FORWARD));
+	handle_error(cudaMemcpy(host_output, device_output, sizeof(float2) * size, cudaMemcpyDeviceToHost));
+	for (i = 0; i < size; i++)
+	{
+		output[i] = sqrt(host_output[i].x * host_output[i].x + host_output[i].y * host_output[i].y);
+	}
+	handle_error(cudaFreeHost(host_input));
+	handle_error(cudaFreeHost(host_output));
+	handle_error(cudaFree(device_input));
+	handle_error(cudaFree(device_output));
+	handle_fft(cufftDestroy(plan));
+	return 0;
+}
+
+uint32_t compute_single_fft_complex(const float *input, float *output, uint32_t size)
 {
 	cufftHandle plan;
 	float2 *host_input = NULL;
@@ -78,18 +114,56 @@ uint32_t compute_multi_fft_abs(const float *input, float *output, uint32_t size,
 	}
 	handle_error(cudaMalloc(&device_input, sizeof(float2) * size));
 	handle_error(cudaMalloc(&device_output, sizeof(float2) * size));
-	handle_error(cudaMemcpy(device_input, host_input, sizeof(float2) * size, cudaMemcpyHostToDevice);
-	handle_fft(cudaPlanMany(&plan, 1, NULL, &size, 
+	handle_error(cudaMemcpy(device_input, host_input, sizeof(float2) * size, cudaMemcpyHostToDevice));
+	handle_fft(cufftPlan1d(&plan, size, CUFFT_C2C, 1));
+	handle_fft(cufftExecC2C(plan, (cufftComplex *) device_input, (cufftComplex *) device_output, CUFFT_FORWARD));
+	handle_error(cudaMemcpy(host_output, device_output, sizeof(float2) * size, cudaMemcpyDeviceToHost));
+	for (i = 0; i < size; i++)
+	{
+		output[i*2] = sqrt(host_output[i].x * host_output[i].x + host_output[i].y * host_output[i].y);
+		output[(i*2)+1] = atan2(host_output[i].y, host_output[i].x);
+	}
+	handle_error(cudaFreeHost(host_input));
+	handle_error(cudaFreeHost(host_output));
+	handle_error(cudaFree(device_input));
+	handle_error(cudaFree(device_output));
+	handle_fft(cufftDestroy(plan));
 	return 0;
 }
 
-uint32_t compute_single_fft_complex(const float *input, float *output, uin32_t size)
+uint32_t compute_multi_fft_complex(const float *input, float *output, uint32_t size, uint32_t stride)
 {
-	return 0;
-}
-
-uint32_t compute_multi_fft_complex(const float *input, float *output, uint32_t size)
-{
+	cufftHandle plan;
+	float2 *host_input = NULL;
+	float2 *host_output = NULL;
+	float2 *device_input = NULL;
+	float2 *device_output = NULL;
+	uint32_t i;
+	int dim[1] = {stride};
+	assert(size % stride == 0);
+	handle_error(cudaMallocHost(&host_input, sizeof(float2) * size));
+	handle_error(cudaMallocHost(&host_output, sizeof(float2) * size));
+	for (i = 0; i < size; i++)
+	{
+		host_input[i].x = input[i];
+		host_input[i].y = 0;
+	}
+	handle_error(cudaMalloc(&device_input, sizeof(float2) * size));
+	handle_error(cudaMalloc(&device_output, sizeof(float2) * size));
+	handle_error(cudaMemcpy(device_input, host_input, sizeof(float2) * size, cudaMemcpyHostToDevice));
+	handle_fft(cufftPlanMany(&plan, 1, dim, NULL, 1, stride, NULL, 1, stride, CUFFT_C2C, size / stride));
+	handle_fft(cufftExecC2C(plan, (cufftComplex *) device_input, (cufftComplex *) device_output, CUFFT_FORWARD));
+	handle_error(cudaMemcpy(host_output, device_output, sizeof(float2) * size, cudaMemcpyDeviceToHost));
+	for (i = 0; i < size; i++)
+	{
+		output[i*2] = sqrt(host_output[i].x * host_output[i].x + host_output[i].y * host_output[i].y);
+		output[(i*2)+1] = atan2(host_output[i].y, host_output[i].x);
+	}
+	handle_error(cudaFreeHost(host_input));
+	handle_error(cudaFreeHost(host_output));
+	handle_error(cudaFree(device_input));
+	handle_error(cudaFree(device_output));
+	handle_fft(cufftDestroy(plan));
 	return 0;
 }
 
