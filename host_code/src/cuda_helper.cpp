@@ -48,7 +48,7 @@ uint32_t single_fft_abs(std::vector<float> *data, std::vector<float> *result) //
 	return 0;
 }
 
-uint32_t multi_fft_abs(std::vector<float> *data, std::vector<float> *result, uint32_t offset, uint32_t stride) //multiple sweeps starting at offset with size stride
+uint32_t multi_fft_abs(std::vector<float> *data, std::vector<float> *result, uint32_t offset, uint32_t stride, uint32_t *return_stride) //multiple sweeps starting at offset with size stride
 {
 	uint32_t i;
 	uint32_t j;
@@ -85,6 +85,7 @@ uint32_t multi_fft_abs(std::vector<float> *data, std::vector<float> *result, uin
 	{
 		result -> push_back(temp[i]);
 	}
+	*return_stride = stride_size;
 	return 0;
 }
 
@@ -120,7 +121,7 @@ uint32_t single_fft_complex(std::vector<float> *data, std::vector<std::pair<floa
 	return 0;
 }
 
-uint32_t multi_fft_complex(std::vector<float> *data, std::vector<std::pair<float, float> > *result, uint32_t offset, uint32_t stride) //multi sweep starting at offset with size stride returns mag & arg
+uint32_t multi_fft_complex(std::vector<float> *data, std::vector<std::pair<float, float> > *result, uint32_t offset, uint32_t stride, uint32_t *return_stride) //multi sweep starting at offset with size stride returns mag & arg
 {
 	uint32_t i;
 	uint32_t j;
@@ -157,5 +158,6 @@ uint32_t multi_fft_complex(std::vector<float> *data, std::vector<std::pair<float
 	{
 		result -> push_back(std::make_pair(temp[2*i], temp[(2*i)+1]));
 	}
+	*return_stride = stride_size;
 	return 0;
 }

@@ -6,6 +6,7 @@
 
 void init_image(void);
 void deinit_image(void);
-int generate_image (std::vector<std::vector<float> > *input, std::string filename);
+int generate_image(std::vector<std::vector<float> > *input, std::string filename);
+int generate_image_flat(std::vector<float> *input, std::string filename, uint32_t stride);
 
 #endif
