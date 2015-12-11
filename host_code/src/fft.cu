@@ -28,7 +28,7 @@ inline void fft_assert(cufftResult code, const char *file, int line, bool abort=
 	}
 }
 
-uint32_t c2c_fft(const float *input, float *output, uint32_t size)
+uint32_t compute_single_fft_abs(const float *input, float *output, uint32_t size)
 {
 	cufftHandle plan;
 	float2 *host_input = NULL;

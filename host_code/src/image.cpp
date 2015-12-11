@@ -3,6 +3,7 @@
 #include <string>
 #include <cassert>
 #include <iostream>
+#include <cmath>
 
 int clamp(int a, int x, int b)
 {
@@ -38,9 +39,9 @@ int generate_image (std::vector<std::vector<float> > *input, std::string filenam
 	{
 		for (unsigned int y = 0; y < input -> at(0).size(); y++)
 		{
-			if (input -> at(x).at(y) > max)
+			if (log(input -> at(x).at(y) + 1) > max)
 			{
-				max = input -> at(x).at(y);
+				max = log(input -> at(x).at(y) + 1);
 			}
 		}
 	}
@@ -48,7 +49,7 @@ int generate_image (std::vector<std::vector<float> > *input, std::string filenam
 	{
 		for (unsigned int y = 0; y < input -> at(0).size(); y++)
 		{
-			v = clamp(0, (int) (255.0 * input -> at(x).at(y) / max), 255);
+			v = clamp(0, (int) (255.0 * log(input -> at(x).at(y) + 1) / max), 255);
 			pixel.rgbRed = v;
 			pixel.rgbGreen = v;
 			pixel.rgbBlue = v;

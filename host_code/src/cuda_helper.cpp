@@ -16,7 +16,7 @@ uint32_t next_pow_2(uint32_t n)
 	return n;
 }
 
-uint32_t compute_fft(std::vector<float> *data, std::vector<float> *result)
+uint32_t single_fft_abs(std::vector<float> *data, std::vector<float> *result) //use for one sweep only
 {
 	uint32_t i;
 	uint32_t actual_size = data -> size();
@@ -34,7 +34,7 @@ uint32_t compute_fft(std::vector<float> *data, std::vector<float> *result)
 		}
 	}
 	float *temp = new float[actual_size];
-	if (c2c_fft(data -> data(), temp, actual_size))
+	if (compute_single_fft_abs(data -> data(), temp, actual_size))
 	{
 		delete temp;
 		return 1;
@@ -44,5 +44,22 @@ uint32_t compute_fft(std::vector<float> *data, std::vector<float> *result)
 		result -> push_back(temp[i]);
 	}
 	delete temp;
+	return 0;
+}
+
+uint32_t multi_fft_abs(std::vector<float> *data, std::vector<float> *result)
+{
+	uint32_t i;
+	//uint32_t actual_size = data -> at(0).size();
+	return 0;
+}
+
+uint32_t single_fft_complex(std::vector<float> *data, std::vector<std::pair<float, float> > *result)
+{
+	return 0;
+}
+
+uint32_t multi_fft_complex(std::vector<float> *data, std::vector<std::pair<float, float> > *result)
+{
 	return 0;
 }

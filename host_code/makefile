@@ -5,12 +5,12 @@ CUDA_CFLAGS=-c -m64 -arch=compute_30 -code=sm_30
 LDFLAGS=-lfreeimage
 CUDA_LDFLAGS=-lcuda -lcudart -lcufft
 EXECUTABLE=beagleradar_host
-DIRS=bin/debug/ bin/release/  build/debug/ build/release/ data/ img/
+DIRS=bin/debug/ bin/release/  build/debug/ build/release/
 CUDA_INCLUDES=-I/opt/cuda/include
 
-all:
-	make debug
-	make release
++all:
+	+make debug
+	+make release
 
 debug: CFLAGS += -g -Og
 debug: CUDA_CFLAGS += -g -G -O0
